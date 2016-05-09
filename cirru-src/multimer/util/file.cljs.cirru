@@ -19,8 +19,7 @@ defn read-from-file (relative-name base-dir)
         []
         reader/read-string content
 
-    -- println |tree tree $ pr-str content
-    {} :type :file :name relative-name :tree tree :ops $ []
+    schema/File. relative-name relative-name tree $ []
 
 defn read-from-dir (relative-name base-dir)
   -- .log js/console |read-from-dir relative-name
@@ -34,11 +33,10 @@ defn read-from-dir (relative-name base-dir)
               real-child $ .join path dirname filename
               child-stat $ .statSync fs real-child
             -- println child-stat
-            [] child-name $ if (.isDirectory child-stat)
+            if (.isDirectory child-stat)
               read-from-dir child-name base-dir
-              read-from-file child-name base-dir
+              {} child-name $ read-from-file child-name base-dir
 
-        into $ {}
+        apply merge
 
-    -- println |children: children
-    {} :type :dir :name relative-name :children children
+    , children

@@ -25,17 +25,17 @@ defonce db-ref $ atom
       {}
 
 defn handle-message (message)
+  println |handle-message message
   let
     (([] state-id op op-data) message)
       op-id $ .generate shortid
       op-time $ .valueOf (js/Date.)
       new-store $ updater @db-ref op op-data state-id op-id op-time
 
-    println |message message
     reset! db-ref new-store
 
 defn dispatch-changes ()
-  println |changes @sockets-ref $ map :id (:states @db-ref)
+  -- println |changes @sockets-ref $ map :id (:states @db-ref)
   doseq
     [] state-id $ map
       fn (entry)
@@ -46,7 +46,6 @@ defn dispatch-changes ()
       (ws $ get @sockets-ref state-id)
         store-cache $ get @caches-ref state-id
         latest-store $ render @db-ref state-id
-      println ws state-id
       .send ws $ pr-str
         differ/diff
           or store-cache $ {}
@@ -57,32 +56,36 @@ defn dispatch-changes ()
 defn handle-ws (ws)
   let
     (id $ .generate shortid)
+      on-message $ fn (message)
+        let
+          (([] op op-data) (reader/read-string message))
+
+          handle-message $ [] id op op-data
+
+      on-close $ fn ()
+        swap! sockets-ref dissoc id
+        handle-message $ [] id :state/disconnect nil
+        .removeAllListeners ws |close
+        .removeAllListeners ws |message
+
     swap! sockets-ref assoc id ws
     handle-message $ [] id :state/connect nil
-    .on ws |message $ fn (message)
-      let
-        (([] op op-data) (reader/read-string message))
-
-        handle-message $ [] id op op-data
-
-    .on ws |close $ fn ()
-      swap! sockets-ref dissoc id
-      do
-        .on ws |close identity
-        handle-message $ [] id :state/disconnect nil
-      .on ws |message identity
+    .on ws |message on-message
+    .on ws |close on-close
 
 defn -main ()
   enable-console-print!
   .on wss |connection handle-ws
   println |database: $ pr-str @db-ref
-  println "|app loaded"
+  println "|app loaded."
   add-watch db-ref :change dispatch-changes
 
 set! *main-cli-fn* -main
 
 defn on-jsload ()
   println "|code updated."
+  .removeAllListeners wss |connection
   .on wss |connection handle-ws
   remove-watch db-ref :change
   add-watch db-ref :change dispatch-changes
+  dispatch-changes
