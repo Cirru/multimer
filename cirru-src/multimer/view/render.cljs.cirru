@@ -32,3 +32,11 @@ defn render (db state-id)
         into ({})
           get-in db $ [] :users :user-id
         , nil
+
+      :file $ if
+        some? $ :focus state
+        into ({})
+          get (:files db)
+            first $ :focus state
+
+        , nil

@@ -11,3 +11,9 @@ defn disconnect
   db op-data state-id op-id op-time
   update db :states $ fn (states)
     dissoc states state-id
+
+defn focus
+  db op-data state-id op-id op-time
+  assoc-in db
+    [] :states state-id :focus
+    , op-data
