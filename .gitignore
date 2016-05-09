@@ -1,0 +1,8 @@
+
+/.nrepl-port
+/.nrepl-history
+/node_modules/
+/figwheel_server.log
+/src
+/target
+/demo/

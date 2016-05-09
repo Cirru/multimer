@@ -1,0 +1,15 @@
+{
+  "name": "multimer",
+  "version": "0.1.0",
+  "description": "Cirru Multimer Editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jiyinyiyong",
+  "license": "MIT",
+  "dependencies": {
+    "shortid": "^2.2.6",
+    "ws": "^1.1.0"
+  }
+}
