@@ -40,6 +40,36 @@ defn append
 
       , db
 
+defn new-expression
+  db op-data state-id op-id op-time
+  let
+    (([] filename coord) op-data)
+
+    if
+      > (count coord)
+        , 1
+      let
+        (coord-before $ subvec coord 0 (dec $ count coord))
+
+        -> db
+          update-in
+            [] :files filename :tree
+            fn (tree)
+              update-in tree coord-before $ fn (expression)
+                into ([])
+                  concat
+                    subvec expression 0 $ inc (last coord)
+                    [] $ [] |
+                    subvec expression $ inc (last coord)
+
+          assoc-in
+            [] :states state-id :focus
+            [] filename $ conj coord-before
+              inc $ last coord
+              , 0
+
+      , db
+
 defn prepend
   db op-data state-id op-id op-time
   let

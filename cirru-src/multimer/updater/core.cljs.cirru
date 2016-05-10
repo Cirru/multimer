@@ -20,4 +20,5 @@ defn updater
     :edit/prepend-line $ edit/prepend-line db op-data state-id op-id op-time
     :edit/insert $ edit/insert db op-data state-id op-id op-time
     :edit/remove $ edit/remove-node db op-data state-id op-id op-time
+    :edit/new-expression $ edit/new-expression db op-data state-id op-id op-time
     , db
