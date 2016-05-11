@@ -6,8 +6,15 @@ ns multimer.core $ :require
   [] cljs.reader :as reader
   [] multimer.view.render :refer $ [] render
   [] multimer.updater.core :refer $ [] updater
+  [] multimer.config :as config
 
 def shortid $ js/require |shortid
+
+def fs $ js/require |fs
+
+def path $ js/require |path
+
+def gaze $ js/require |gaze
 
 def WebSocketServer $ .-Server (js/require |ws)
 
@@ -19,10 +26,24 @@ defonce caches-ref $ atom ({})
 
 defonce db-ref $ atom
   let
-    (files $ read-from-dir | |../demo/)
+    (files $ read-from-dir | config/base-dir)
+      has-db? $ .existsSync fs config/storage
     -- .log js/console files
-    schema/Database. files ({})
-      {}
+    if has-db?
+      let
+        (content $ .readFileSync fs config/storage |utf8)
+          db-data $ reader/read-string content
+        assoc db-data :files files
+
+      schema/Database. files ({})
+        {}
+        hash-set
+
+defn handle-save ()
+  let
+    (db-string $ pr-str (-> @db-ref (dissoc :files) (dissoc :states) (update :users $ fn (users) (->> users (map $ fn (entry) ([] (key entry) (into ({}) (val entry)))) (into $ {})))))
+
+    .writeFile fs config/storage db-string $ fn (err)
 
 defn handle-message (message)
   println |handle-message message
@@ -33,6 +54,7 @@ defn handle-message (message)
       new-store $ updater @db-ref op op-data state-id op-id op-time
 
     reset! db-ref new-store
+    handle-save
 
 defn dispatch-changes ()
   -- println |changes @sockets-ref $ map :id (:states @db-ref)
@@ -73,12 +95,32 @@ defn handle-ws (ws)
     .on ws |message on-message
     .on ws |close on-close
 
+defn watch-disk ()
+  gaze
+    .join path config/base-dir |**/*
+    fn (err watcher)
+      println "|err in gaze:" err
+      let
+        (base-path $ .join path js/process.env.PWD config/base-dir)
+        .on watcher |added $ fn (filepath)
+          let
+            (filename $ path.relative base-path filepath)
+            println |added filename
+            handle-message $ [] nil :file/record ([] filename config/base-dir)
+
+        .on watcher |deleted $ fn (filepath)
+          let
+            (filename $ path.relative base-path filepath)
+            println |deleted filename
+            handle-message $ [] nil :file/remove filename
+
 defn -main ()
   enable-console-print!
   .on wss |connection handle-ws
   println |database: $ pr-str @db-ref
   println "|app loaded."
   add-watch db-ref :change dispatch-changes
+  watch-disk
 
 set! *main-cli-fn* -main
 

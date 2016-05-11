@@ -17,3 +17,20 @@ defn focus
   assoc-in db
     [] :states state-id :focus
     , op-data
+
+defn out
+  db op-data state-id op-id op-time
+  let
+    (coord $ get-in db ([] :states state-id :focus 1))
+
+    if
+      and (some? coord)
+        > (count coord)
+          , 1
+
+      assoc-in db
+        [] :states state-id :focus 1
+        into ([])
+          but-last coord
+
+      , db

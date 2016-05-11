@@ -35,8 +35,14 @@ defn render (db state-id)
 
       :file $ if
         some? $ :focus state
-        into ({})
-          get (:files db)
-            first $ :focus state
+        let
+          (maybe-file $ get (:files db) (first $ :focus state))
+
+          if (some? maybe-file)
+            into ({})
+              , maybe-file
+            , nil
 
         , nil
+
+      :vocabulary $ :vocabulary db

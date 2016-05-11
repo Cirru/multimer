@@ -6,10 +6,15 @@ defn update-token
   let
     (([] filename coord text) op-data)
 
-    update-in db
-      [] :files filename :tree
-      fn (tree)
-        assoc-in tree coord text
+    if
+      > (count coord)
+        , 1
+      update-in db
+        [] :files filename :tree
+        fn (tree)
+          assoc-in tree coord text
+
+      , db
 
 defn append
   db op-data state-id op-id op-time

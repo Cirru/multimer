@@ -19,7 +19,7 @@ defn read-from-file (relative-name base-dir)
         []
         reader/read-string content
 
-    schema/File. relative-name relative-name tree $ []
+    schema/File. relative-name tree base-dir
 
 defn read-from-dir (relative-name base-dir)
   -- .log js/console |read-from-dir relative-name
