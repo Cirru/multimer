@@ -18,7 +18,7 @@ def gaze $ js/require |gaze
 
 def WebSocketServer $ .-Server (js/require |ws)
 
-defonce wss $ new WebSocketServer (js-obj |port 7100)
+defonce wss $ new WebSocketServer (js-obj |port config/port)
 
 defonce sockets-ref $ atom ({})
 
@@ -31,7 +31,7 @@ defonce db-ref $ atom
       {}
 
 defn handle-message (message)
-  println |handle-message message
+  -- println |handle-message message
   let
     (([] state-id op op-data) message)
       op-id $ .generate shortid
@@ -83,7 +83,8 @@ defn watch-disk ()
   gaze
     .join path config/base-dir |**/*
     fn (err watcher)
-      println "|err in gaze:" err
+      if (some? err)
+        println "|err in gaze:" err
       let
         (base-path $ .join path js/process.env.PWD config/base-dir)
         .on watcher |added $ fn (filepath)
@@ -101,8 +102,8 @@ defn watch-disk ()
 defn -main ()
   enable-console-print!
   .on wss |connection handle-ws
-  println |database: $ pr-str @db-ref
-  println "|app loaded."
+  -- println |database: $ pr-str @db-ref
+  println $ str "|Server loaded. Open " |http://repo.cirru.org/multimer-app/?port= config/port |&domain=localhost "| to edit."
   add-watch db-ref :change dispatch-changes
   watch-disk
 
