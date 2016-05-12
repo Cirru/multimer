@@ -27,23 +27,8 @@ defonce caches-ref $ atom ({})
 defonce db-ref $ atom
   let
     (files $ read-from-dir | config/base-dir)
-      has-db? $ .existsSync fs config/storage
-    -- .log js/console files
-    if has-db?
-      let
-        (content $ .readFileSync fs config/storage |utf8)
-          db-data $ reader/read-string content
-        assoc db-data :files files
-
-      schema/Database. files ({})
-        {}
-        hash-set
-
-defn handle-save ()
-  let
-    (db-string $ pr-str (-> @db-ref (dissoc :files) (dissoc :states) (update :users $ fn (users) (->> users (map $ fn (entry) ([] (key entry) (into ({}) (val entry)))) (into $ {})))))
-
-    .writeFile fs config/storage db-string $ fn (err)
+    schema/Database. files ({})
+      {}
 
 defn handle-message (message)
   println |handle-message message
@@ -54,7 +39,6 @@ defn handle-message (message)
       new-store $ updater @db-ref op op-data state-id op-id op-time
 
     reset! db-ref new-store
-    handle-save
 
 defn dispatch-changes ()
   -- println |changes @sockets-ref $ map :id (:states @db-ref)

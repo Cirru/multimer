@@ -3,7 +3,6 @@ ns multimer.updater.core $ :require
   [] multimer.updater.state :as state
   [] multimer.updater.user :as user
   [] multimer.updater.edit :as edit
-  [] multimer.updater.vocabulary :as vocabulary
   [] multimer.updater.effect :as effect
   [] multimer.updater.file :as file
 
@@ -25,8 +24,6 @@ defn updater
     :edit/insert $ edit/insert db op-data state-id op-id op-time
     :edit/remove $ edit/remove-node db op-data state-id op-id op-time
     :edit/new-expression $ edit/new-expression db op-data state-id op-id op-time
-    :vocabulary/add-word $ vocabulary/add-word db op-data state-id op-id op-time
-    :vocabulary/rm-word $ vocabulary/rm-word db op-data state-id op-id op-time
     :effect/save-file $ effect/save-file db op-data state-id op-id op-time
     :file/record $ file/record-file db op-data state-id op-id op-time
     :file/remove $ file/remove-file db op-data state-id op-id op-time

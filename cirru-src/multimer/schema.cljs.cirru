@@ -7,6 +7,6 @@ defrecord Focus $ file coord
 
 defrecord State $ id user-id focus
 
-defrecord Database $ files users states vocabulary
+defrecord Database $ files users states
 
 defrecord File $ name tree base

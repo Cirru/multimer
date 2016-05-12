@@ -44,5 +44,3 @@ defn render (db state-id)
             , nil
 
         , nil
-
-      :vocabulary $ :vocabulary db
