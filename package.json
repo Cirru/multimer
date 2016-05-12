@@ -1,13 +1,16 @@
 {
   "name": "multimer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cirru Multimer Editor",
-  "main": "index.js",
+  "main": "target/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "jiyinyiyong",
   "license": "MIT",
+  "bin": {
+    "multimer": "target/main.js"
+  },
   "dependencies": {
     "gaze": "^1.0.0",
     "shortid": "^2.2.6",

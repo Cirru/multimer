@@ -70,7 +70,7 @@
 (deftask build-simple []
   (comp
     (compile-cirru)
-    (cljs :compiler-options {:target :nodejs})
+    (cljs :compiler-options {:target :nodejs :optimizations :simple})
     (target)))
 
 ; bug: after optimization, method exported from npm package breaks

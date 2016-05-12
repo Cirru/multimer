@@ -31,6 +31,6 @@ defn out
       assoc-in db
         [] :states state-id :focus 1
         into ([])
-          but-last coord
+          butlast coord
 
       , db
